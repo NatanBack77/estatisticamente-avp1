@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estatisticamente — Defesa AVP1, Estatística 2026.2</title>
+<style>
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(assets/fonts/HankenGrotesk-normal-400.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(assets/fonts/HankenGrotesk-normal-500.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(assets/fonts/HankenGrotesk-normal-700.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(assets/fonts/IBMPlexMono-normal-400.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(assets/fonts/IBMPlexMono-normal-500.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(assets/fonts/Newsreader-italic-400.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(assets/fonts/Newsreader-normal-400.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(assets/fonts/Newsreader-normal-600.woff2) format('woff2');
+  
+}
+/* Direção visual: relatório impresso de estatística oficial (papel quente, tinta, serifa editorial).
+   Sem cartões: hierarquia por escala, régua fina e espaço. Cor = categoria do indicador, só isso. */
+:root{
+  --paper:#f3eee4; --ink:#1a1916; --ink-2:#56524a; --rule:#a99f8a; --rule-2:#e3dccd;
+  --blue:#1f6fb2;   /* coeficiente */
+  --ochre:#c98200;  /* índice: barras, linhas e marcadores */ --ochre-ink:#8f5a00;  /* índice: só TEXTO (contraste >= 4,5:1) */
+  --brick:#b03a7a;  /* taxa (amora); paleta validada com validate_palette.js */
+  --serif:'Newsreader',Georgia,'Times New Roman',serif;
+  --sans:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0e0d0b;overflow:hidden;font-family:var(--sans);color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;background:var(--paper);overflow:hidden}
+.slide{position:absolute;inset:0;display:none;padding:96px 72px 64px}
+.slide.active{display:block}
+.slide>*{position:relative}
+
+/* cabeçalho corrente */
+.hdr{position:absolute!important;top:34px;left:72px;right:72px;display:flex;justify-content:space-between;align-items:baseline;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:500;border-bottom:1px solid var(--rule);padding-bottom:12px}
+.hdr b{color:var(--ink);font-weight:700}
+.hdr .pg{font-family:var(--mono);letter-spacing:.04em}
+.foot{position:absolute!important;left:72px;right:72px;bottom:28px;font-size:17px;color:var(--ink-2);display:flex;justify-content:space-between;gap:32px;line-height:1.35}
+
+/* tipografia */
+h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:1.06;letter-spacing:-.018em}
+h1 em,h2 em{font-style:italic}
+h2{font-family:var(--serif);font-weight:400;font-size:44px;line-height:1.1;letter-spacing:-.015em;max-width:980px}
+.lead{font-size:22px;line-height:1.45;color:var(--ink-2);max-width:760px}
+.mono{font-family:var(--mono)}
+.tnum{font-variant-numeric:tabular-nums}
+.k{font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.cb{color:var(--blue);--cat:var(--blue)} .ci{color:var(--ochre-ink);--cat:var(--ochre)} .ct{color:var(--brick);--cat:var(--brick)}
+
+/* ---- capa ---- */
+.cover{padding:0}
+.cover .logo{position:absolute;left:44px;top:14px;width:190px;height:190px}
+.cover .left{position:absolute;left:72px;top:210px;width:700px}
+.cover .k{color:var(--ink-2);margin-bottom:22px}
+.cover h1{font-size:58px}
+.cover .lead{margin-top:26px;font-size:21px;max-width:640px}
+.cover .team{position:absolute;left:72px;bottom:44px;width:700px;font-size:16px;line-height:1.55;color:var(--ink-2)}
+.cover .team b{color:var(--ink);letter-spacing:.14em;text-transform:uppercase;font-size:15px;display:block;margin-bottom:4px}
+.cover .right{position:absolute;left:840px;top:64px;bottom:64px;right:72px;border-left:1px solid var(--rule);padding-left:44px;display:flex;flex-direction:column;justify-content:space-between}
+.cover .right .n{font-family:var(--serif);font-size:88px;line-height:1;letter-spacing:-.02em}
+.cover .right .l{font-size:16px;color:var(--ink-2);margin-top:6px;line-height:1.35}
+.cover .right .cap{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+
+/* ---- roteiro ---- */
+.toc{margin-top:34px;border-top:2px solid var(--ink)}
+.toc .row{display:grid;grid-template-columns:110px 1fr 140px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--rule)}
+.toc .n{font-family:var(--serif);font-size:56px;line-height:1;color:var(--ink-2)}
+.toc .t{font-family:var(--serif);font-size:38px;letter-spacing:-.01em}
+.toc .m{font-family:var(--mono);font-size:20px;text-align:right;color:var(--ink-2)}
+
+/* ---- base ---- */
+.hero{display:grid;grid-template-columns:560px 1fr;gap:64px;margin-top:48px;align-items:start}
+.hero .big{font-family:var(--serif);font-size:170px;line-height:.9;letter-spacing:-.04em;color:var(--ink);font-variant-numeric:lining-nums}
+.hero .cap{font-size:22px;color:var(--ink-2);margin-top:14px;line-height:1.35}
+.dl{border-top:2px solid var(--ink)}
+.dl .r{display:grid;grid-template-columns:170px 1fr;gap:20px;padding:15px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.dl .v{font-family:var(--serif);font-size:34px;line-height:1;letter-spacing:-.01em}
+.dl .d{font-size:19px;line-height:1.4;color:var(--ink-2)}
+.dl.c .r{grid-template-columns:210px 1fr;padding:11px 0}.dl.c .v{font-size:29px;white-space:nowrap}.dl.c .d{font-size:17px}
+.note-line{margin-top:26px;font-size:19px;line-height:1.5;max-width:1000px;border-left:3px solid var(--ink);padding-left:18px}
+
+/* ---- tabela de bases ---- */
+table.t{width:100%;border-collapse:collapse;margin-top:26px}
+.t th{font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ink-2);text-align:left;padding:0 14px 12px 0;border-bottom:2px solid var(--ink)}
+.t td{padding:26px 14px 26px 0;border-bottom:1px solid var(--rule);vertical-align:top;font-size:21px;line-height:1.4}
+.t td.nm{font-family:var(--serif);font-size:28px;line-height:1.15;letter-spacing:-.01em}
+.t td.nm small{display:block;font-family:var(--sans);font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-top:5px;font-weight:500}
+.t td.no{font-family:var(--mono);font-size:20px;white-space:nowrap}
+.t tr.win td{border-bottom:2px solid var(--ink)}
+.t tr.win td.nm{font-weight:600}
+.dots{display:flex;gap:4px;margin-bottom:6px}
+.dots i{width:14px;height:14px;background:var(--ink);display:block}
+.dots i.o{background:transparent;border:1.5px solid var(--brick)}
+
+.why{color:var(--ink-2)}
+
+/* ---- colunas de texto ---- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:72px;margin-top:34px}
+.two h3{font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ink-2);padding-bottom:12px;border-bottom:2px solid var(--ink);margin-bottom:6px}
+.two .i{padding:16px 0;border-bottom:1px solid var(--rule);font-size:22px;line-height:1.45}
+.two .i b{font-weight:700}
+.rule-box{font-family:var(--serif);font-size:34px;line-height:1.25;letter-spacing:-.01em;padding:16px 0 18px;border-bottom:1px solid var(--rule)}
+.rule-box small{display:block;font-family:var(--sans);font-size:16px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:8px}
+
+.links{display:grid;grid-template-columns:1fr 1fr;column-gap:72px;margin-top:26px}
+.lk{border-top:2px solid var(--ink);padding-top:14px}
+.lk small{display:block;font-size:15px;letter-spacing:.1em;white-space:nowrap;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.lk a{cursor:pointer;display:block;font-family:var(--mono);font-size:15px;line-height:1.4;color:var(--ink);text-decoration:underline;text-underline-offset:4px;overflow-wrap:break-word}
+.lk a:hover,.lk a:focus-visible{background:var(--ink);color:var(--paper);outline:none}
+.lk span{display:block;margin-top:8px;font-size:18px;color:var(--ink-2);line-height:1.35}
+.dq{margin-top:16px}.dq td.mono{font-size:14px}.dq td{font-size:16px;padding:5px 12px 5px 0}.dq td.no{font-size:17px}.dq td.why{font-size:16px;line-height:1.3}.dq2{margin-top:14px;gap:56px}.dq2 h3{padding-bottom:8px}.dq2 .i{font-size:16px;line-height:1.35;padding:10px 0}
+.lst{margin-top:10px}.lst th{padding-bottom:7px}.lst td{font-size:17px;line-height:1.22;padding:3px 10px 3px 0;border-bottom:1px solid var(--rule-2);vertical-align:top}.lst tr.d td{color:var(--ink)}.lst tr.d td:nth-child(2),.lst tr.d td.sc{font-weight:700}.lst td.mono{font-size:16px;line-height:1.3}.lst td.sl,.lst td.sc{white-space:nowrap}.lst td i{font-style:normal;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:700;margin-left:6px}.lst td.lt{font-family:var(--serif);font-size:24px;color:var(--ink-2)}.lst td.sl{color:var(--ink-2)}
+.fch{margin-top:18px}
+.fch .i{font-size:24px;line-height:1.4}
+.met{margin-top:16px}
+.met h3{font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ink-2);padding-bottom:12px;border-bottom:2px solid var(--ink);margin-bottom:12px}
+.met .fm{font-family:var(--mono);font-size:17px;line-height:1.4;margin-top:10px;color:var(--ink)}.met .bc{font-size:19px;line-height:1.4;margin-top:8px}.met .src{margin-top:12px;font-size:19px;color:var(--ink-2)}
+.met p{font-size:21px;line-height:1.45;max-width:1080px}
+/* ---- frentes ---- */
+.fr{display:grid;grid-template-columns:1fr 1fr;column-gap:72px;margin-top:26px}
+.fr .b{display:grid;grid-template-columns:60px 1fr;padding:20px 0 22px;border-top:2px solid var(--ink)}
+.fr .ltr{font-family:var(--serif);font-size:44px;line-height:1;color:var(--ink-2)}
+.fr h3{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.2;margin-bottom:10px;letter-spacing:-.005em}
+.fr li{list-style:none;font-size:19px;line-height:1.35;padding:4px 0;color:var(--ink-2)}
+.fr li.d{color:var(--ink);font-weight:700;display:flex;gap:10px;align-items:baseline}
+.fr li.d i::before{content:'';display:inline-block;width:9px;height:9px;background:var(--cat);margin-right:6px}
+.fr li.d i{color:var(--ink-2)!important;font-style:normal;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+
+/* ---- slide de indicador ---- */
+.ind{display:grid;grid-template-columns:380px 1fr;gap:64px;height:100%}
+.ind .lft .k{display:flex;gap:10px;align-items:center;padding-top:12px;border-top:4px solid var(--cat);color:var(--ink)}
+.ind .lft .k span{color:var(--ink-2);font-weight:500;letter-spacing:.06em;text-transform:none;font-size:15px}
+.ind h2{font-size:29px;line-height:1.12;margin:12px 0 4px}
+.big-n{font-family:var(--serif);font-size:100px;line-height:1.08;letter-spacing:-.035em;margin:6px 0 2px;font-variant-numeric:lining-nums}
+.big-n small{display:block;font-size:17px;letter-spacing:0;font-family:var(--sans);color:var(--ink-2);margin:12px 0 10px;font-weight:500}
+.frm{font-family:var(--mono);font-size:15px;line-height:1.45;color:var(--ink);border-left:2px solid var(--ink);padding:2px 0 2px 12px;margin:10px 0}
+.frm span{color:var(--ink-2)}
+.round{font-size:17px;color:var(--ink-2);margin-bottom:14px}
+.round b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+.q{border-top:1px solid var(--ink)}
+.q .r{display:grid;grid-template-columns:1fr 92px;gap:8px;padding:7px 0;border-bottom:1px solid var(--rule);font-size:16px;line-height:1.3;align-items:baseline}
+.q .r b{text-align:right;font-family:var(--mono);font-weight:500;font-size:15px}
+.q .r b.s{color:var(--ink)} .q .r b.nn{color:var(--ink-2)}
+.q .cap{font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ink-2);padding-bottom:6px}
+.ind .rgt{padding-top:8px}
+.ch-t{font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ink-2);margin-bottom:6px}
+.chart{position:relative;margin-left:132px;margin-right:64px;margin-top:26px;margin-bottom:22px}
+.chart .row{position:relative;height:40px;outline:none}
+.chart .lab{position:absolute;right:100%;top:50%;transform:translateY(-50%);padding-right:14px;text-align:right;font-size:19px;white-space:nowrap;color:var(--ink)}
+.chart .lab.ref{color:var(--ink-2)}
+.chart .bar{position:absolute;left:0;top:9px;height:22px;background:var(--cat);border-radius:0 4px 4px 0;transition:filter .15s}
+.chart .bar.hatch{background:color-mix(in srgb,var(--cat) 16%,transparent);border:2px solid var(--cat);border-left:0}
+.chart .row:hover .bar,.chart .row:focus-visible .bar{filter:brightness(1.18) saturate(1.1)}
+.chart .row:focus-visible{box-shadow:0 0 0 2px var(--ink);border-radius:2px}
+.chart .val{position:absolute;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:19px;font-weight:600;color:var(--ink);background:var(--paper);padding:1px 6px 1px 8px}
+.chart .nat{position:absolute;top:-16px;bottom:0;border-left:1.5px dashed var(--ink-2);pointer-events:none}
+.chart .nat span{position:absolute;top:-24px;left:0;transform:translateX(-50%);font-size:15px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;white-space:nowrap;background:var(--paper);padding:0 4px;color:var(--ink)}
+.chart .axis{position:absolute;left:0;top:0;bottom:0;border-left:1.5px solid var(--ink)}
+.chart .tip{position:absolute;top:50%;transform:translateY(-50%);z-index:6;background:var(--ink);color:var(--paper);padding:7px 12px;font-size:15px;line-height:1.3;white-space:nowrap;border-radius:3px;opacity:0;pointer-events:none;transition:opacity .12s}
+.chart .tip b{font-family:var(--mono);font-size:18px;display:block}
+.chart .row:hover .tip,.chart .row:focus-visible .tip{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.callout-i{margin-top:2px;margin-bottom:14px;font-size:19px;line-height:1.4;border-left:4px solid var(--ochre);padding:4px 0 4px 16px;max-width:640px}
+.callout-i b{font-family:var(--serif);font-size:30px;font-weight:600;letter-spacing:-.01em}
+
+/* ---- síntese ---- */
+.syn .tb.h .cb,.syn .tb.h .ci,.syn .tb.h .ct{color:var(--ink);border-bottom:3px solid var(--cat);padding-bottom:4px}
+.syn .row .a .cb,.syn .row .a .ci,.syn .row .a .ct{color:var(--ink-2)}
+.callout-i{color:var(--ink)}
+.callout-i b{color:var(--ink)}
+
+.syn{display:grid;grid-template-columns:1fr 1.2fr;gap:72px;margin-top:22px}
+.syn h3{font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ink-2);padding-bottom:12px;border-bottom:2px solid var(--ink)}
+.syn .row{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:22px 0;border-bottom:1px solid var(--rule);gap:16px}
+.syn .row .a{font-size:18px}
+.syn .row .n{font-family:var(--serif);font-size:44px;line-height:1;letter-spacing:-.02em}
+.syn .tb{display:grid;grid-template-columns:1fr repeat(3,96px);align-items:baseline;padding:8px 0;border-bottom:1px solid var(--rule);text-align:center}
+.syn .tb.h{padding:10px 0;border-bottom:1px solid var(--ink);font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.syn .tb .reg{text-align:left;font-size:19px}
+.syn .tb .reg small{display:block;font-size:14px;color:var(--ink-2);margin-top:2px}
+.syn .tb .p{font-family:var(--serif);font-size:34px;line-height:1;letter-spacing:-.02em}
+.syn .p em{display:inline;margin-left:5px;font-family:var(--sans);font-style:normal;font-size:14px;letter-spacing:0;color:var(--ink-2)}
+.syn .p.bad{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+.syn .sub{margin-top:12px;font-size:19px;color:var(--ink-2);line-height:1.4}
+.pull{position:absolute!important;left:72px;right:72px;bottom:60px;font-family:var(--serif);font-style:italic;font-size:34px;line-height:1.2;letter-spacing:-.01em;border-top:2px solid var(--ink);padding-top:18px}
+
+/* ---- limites ---- */
+.lim{display:grid;grid-template-columns:1fr 1fr;column-gap:72px;margin-top:34px}
+.lim .b{padding:24px 0 30px;border-top:2px solid var(--ink);display:grid;grid-template-columns:56px 1fr}
+.lim .nm{font-family:var(--serif);font-size:40px;line-height:1;color:var(--ink-2)}
+.lim h3{font-family:var(--serif);font-weight:600;font-size:26px;line-height:1.15;margin-bottom:8px;letter-spacing:-.01em}
+.lim p{font-size:21px;line-height:1.45;color:var(--ink-2)}
+
+/* ---- peer review ---- */
+.pr{margin-top:28px;border-top:2px solid var(--ink)}
+.pr .r{display:grid;grid-template-columns:70px 1fr 170px;gap:12px;padding:22px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.pr .r .n{font-family:var(--serif);font-size:44px;line-height:1;color:var(--ink-2)}
+.pr .r .tx{font-family:var(--serif);font-size:27px;line-height:1.25;letter-spacing:-.005em}
+.pr .r .st{font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;text-align:right}
+.pr .st.ok{color:var(--ink)} .pr .st.op{color:var(--ink-2)}
+.pr.rt{margin-top:20px}.pr.rt .r{padding:13px 0}.pr.rt .r .tx{font-size:25px;line-height:1.22}.pr.rt .r .n{font-size:38px}
+.pr .r.sub{border-bottom:1px solid var(--rule);padding:0 0 18px;margin-top:-1px}.pr .r.hs{border-bottom:0;padding-bottom:10px}
+.pr .r.sub .tx{grid-column:2;font-family:var(--sans);font-size:20px;color:var(--ink-2)}
+.pr .r.sub .tx b{color:var(--ink)}
+
+/* ---- fecha ---- */
+.end h1{font-size:96px;margin-top:8px}
+.end .three{display:grid;grid-template-columns:repeat(3,1fr);column-gap:48px;margin-top:44px;border-top:2px solid var(--ink)}
+.end .three .b{padding-top:18px}
+.end .three .n{font-family:var(--serif);font-size:80px;line-height:1;letter-spacing:-.03em}
+.end .three .l{font-size:17px;color:var(--ink-2);margin-top:8px}
+
+/* nav e notas */
+.nav{position:absolute;right:72px;bottom:6px;font-family:var(--mono);font-size:13px;color:var(--ink-2);z-index:5}
+.progress{position:absolute;left:0;bottom:0;height:3px;background:var(--ink);z-index:5;transition:width .25s}
+.notes{display:none}
+#notesPanel{position:absolute;left:0;right:0;bottom:0;background:#1a1916;color:#efe9dc;padding:18px 48px 22px;font-size:18px;line-height:1.5;border-top:3px solid #efe9dc;z-index:20;display:none;max-height:34%;overflow:auto}
+#notesPanel.show{display:block}
+#notesPanel b{color:#e6b96a}
+@media (prefers-reduced-motion:no-preference){.slide.active{animation:in .28s ease-out}@keyframes in{from{opacity:0}to{opacity:1}}}
+</style>
+</head>
+<body>
+<div id="stage">
+<div class="progress" id="progress"></div>
+
+<!-- 1. CAPA -->
+<section class="slide cover active">
+  <img class="logo" src="assets/logo-unifap.png" alt="UniFAP — Centro Universitário Paraíso">
+  <div class="left">
+    <div class="k">Estatística 2026.2 · Defesa AVP1</div>
+    <h1>Escolas sem apoio psicossocial: <em>o que o Censo Escolar 2025 permite medir</em></h1>
+    <p class="lead">Lei nº 13.935/2019 como fio condutor. Três indicadores: dois sobre as 180.540 escolas em atividade e um sobre as 138.086 públicas.</p>
+  </div>
+  <div class="team"><b>Equipe Estatisticamente</b>Rodrigo Fernandes Paulino de Lima · Gabriel Rodrigues Silva · Arthur de Araujo Neves · Pedro Emanuel Ribeiro dos Santos · Natanael Marcelino da Silva Vieira</div>
+  <div class="right">
+    <div class="cap">Os três números nacionais</div>
+    <div><div class="n cb">0,36</div><div class="l">coeficiente de acessibilidade das salas</div></div>
+    <div><div class="n ci">0,60</div><div class="l">índice de equipamentos tecnológicos por sala</div></div>
+    <div><div class="n ct">17,81%</div><div class="l">taxa de cobertura de psicólogo nas escolas públicas</div></div>
+  </div>
+  <aside class="notes"><b>[0:00 — abertura, 20 s]</b> Apresentar a equipe e o fio condutor: a lei exige psicólogo e assistente social nas redes públicas; a pergunta é o que a base pública consegue medir sobre isso. Cor = categoria do indicador em todo o deck (azul coeficiente, ocre índice, tijolo taxa). <b>Quem responde o quê:</b> líder — decisão da base; analista — fórmulas; desenvolvedor — reprodutibilidade; pesquisador — fontes e lei; orador — abertura e fio da fala.</aside>
+</section>
+
+<!-- 2. ROTEIRO -->
+<section class="slide">
+  <div class="hdr"><span><b>Estatisticamente</b> · Defesa AVP1</span><span class="pg">02</span></div>
+  <h2>O que vem nos próximos vinte minutos</h2>
+  <div class="toc">
+    <div class="row"><span class="n">1</span><span class="t">A base e a decisão</span><span class="m">4 min</span></div>
+    <div class="row"><span class="n">2</span><span class="t">O que a base permite medir</span><span class="m">3 min</span></div>
+    <div class="row"><span class="n">3</span><span class="t">Os três indicadores</span><span class="m">8 min</span></div>
+    <div class="row"><span class="n">4</span><span class="t">O peer review nos dois sentidos</span><span class="m">5 min</span></div>
+  </div>
+  <aside class="notes"><b>[0:20 — 10 s]</b> Ler só os quatro títulos. Bloco 3 (7:00 a 15:00): 4.1 em 2:00, 4.2 em 1:40, 4.3 em 2:00; cada ficha 20 s (podem ir para a arguição); síntese 50 s; limitações 30 s. Seguir os horários das notas de cada slide.</aside>
+</section>
+
+<!-- 3. BASE -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 1</b> · A base e a decisão</span><span class="pg">03</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto I · Base escolhida</div>
+  <h2 style="margin-top:8px">Censo Escolar da Educação Básica 2025, INEP</h2>
+  <div class="hero">
+    <div>
+      <div class="big">180.540</div>
+      <div class="cap">escolas em atividade: a base de análise.<br>Unidade de observação: a escola (CO_ENTIDADE).</div>
+    </div>
+    <div class="dl">
+      <div class="r"><span class="v tnum">214.192</span><span class="d">registros totais na Tabela_Escola_2025_V2</span></div>
+      <div class="r"><span class="v tnum">33.652</span><span class="d">paralisadas ou extintas: campos vazios por definição, não perda amostral</span></div>
+      <div class="r"><span class="v tnum">37</span><span class="d">variáveis usadas: 32 quantitativas (QT_) e 5 de recorte</span></div>
+      <div class="r"><span class="v tnum">290 → 37</span><span class="d">135 MB em latin-1 reduzidos a ~18 MB em CSV UTF-8, sem criar variável nova</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Recortes: CO_ENTIDADE · SG_UF · NO_REGIAO · TP_DEPENDENCIA · TP_SITUACAO_FUNCIONAMENTO</span><span>Fonte: INEP, microdados do Censo Escolar</span></div>
+  <aside class="notes"><b>[0:30 — 50 s]</b> 33.652 registros vazios não são perda: escola paralisada/extinta não tem matrícula nem sala. Por isso o denominador é 180.540 (214.192 − 33.652). Se perguntarem "e as outras 253 variáveis?": mantivemos só as 37 que sustentam as fórmulas.</aside>
+</section>
+
+<!-- 4. COMPARAÇÃO -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 1</b> · A base e a decisão</span><span class="pg">04</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto I · Por que esta base</div>
+  <h2 style="margin-top:8px">Três candidatas; só uma sem requisito em falha</h2>
+  <table class="t">
+    <tr><th style="width:330px">Base</th><th class="no" style="width:120px">Volumetria</th><th style="width:110px">Variáveis</th><th style="width:170px">Requisitos (de 11)</th><th>Motivo da eliminação</th></tr>
+    <tr><td class="nm">Candidatos Eleições 2026<small>TSE</small></td><td class="no tnum">20.769</td><td class="no">50</td>
+      <td><div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i></div><span class="mono">10/11</span></td>
+      <td class="why">CPF completo sem máscara: proibição absoluta (LGPD).</td></tr>
+    <tr><td class="nm">BDQueimadas, focos de calor 2025<small>INPE</small></td><td class="no tnum">136.393</td><td class="no">9</td>
+      <td><div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i class="o"></i></div><span class="mono">9/11</span></td>
+      <td class="why">Só 2 variáveis quantitativas contra as 6 exigidas.</td></tr>
+    <tr class="win"><td class="nm">Censo Escolar 2025<small>INEP · escolhida</small></td><td class="no tnum">214.192</td><td class="no">290 <span style="color:var(--ink-2)">(37 usadas)</span></td>
+      <td><div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="mono" style="font-weight:500">11/11</span></td>
+      <td class="why">Nenhum requisito em falha.</td></tr>
+  </table>
+  <aside class="notes"><b>[1:20 — 50 s]</b> Resposta à crítica 2 do peer review (bloco 4). O TSE falha num requisito absoluto (LGPD); o INPE falha em variáveis quantitativas, que sustentam as unidades da disciplina. É eliminação por critério, não por gosto.</aside>
+</section>
+
+<!-- 5. DIAGNÓSTICO 88888 -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 1</b> · A base e a decisão</span><span class="pg">05</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto I · Ficha técnica · diagnóstico de qualidade</div>
+  <h2 style="margin-top:8px">Um código que parece número e não é</h2>
+  <div class="hero">
+    <div>
+      <div class="big">88888</div>
+      <div class="cap">é o próprio INEP marcando um valor extremo: declarado muito acima do esperado pela razão profissional/matrícula (ou equipamento/sala), tratamento aplicado desde 2019. Não é ausência de resposta. Presente em 26 das 32 variáveis QT_. Decisão da equipe: desconsiderar o 88888 (tratá-lo como não informado) antes de qualquer indicador.</div>
+    </div>
+    <div class="dl c">
+      <div class="r"><span class="v tnum">5 a 1.893</span><span class="d">ocorrências por variável: QT_PROF_PSICOLOGO 91, QT_PROF_ASSIST_SOCIAL 57, QT_EQUIP_TV 1.893 (o pior caso)</span></div>
+      <div class="r"><span class="v tnum">164,79 → 0,60</span><span class="d">índice de equipamentos por sala sem o tratamento (contaminado pelo 88888) e após o tratamento</span></div>
+      <div class="r"><span class="v tnum">1 registro</span><span class="d">CO_ENTIDADE 43145833 sem SG_UF e NO_REGIAO no arquivo original do INEP; mantido sem alteração</span></div>
+      <div class="r"><span class="v tnum">30 ago. 2026</span><span class="d">data de acesso: INEP, Microdados do Censo Escolar 2025</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Fonte: INEP, Dicionário de Dados da Educação Básica, Anexo I. Verificado na base original (214.192 linhas), notebook censo_escolar.ipynb.</span></div>
+  <aside class="notes"><b>[2:10 — 35 s]</b> Resposta direta à pergunta de arguição "que decisão a equipe tomou sobre os valores ausentes, e onde isso está registrado?": 88888 não é não-resposta: é a marcação de valor extremo do próprio INEP (dicionário de dados, Anexo I: "registro com marcação de valor extremo, valor superior ao limite máximo definido com base na distribuição da razão de profissionais por matrícula"; nota do dicionário: "em 2019, primeiro ano em que foi aplicado tratamento de valores extremos, marcados com o código 88888"). Em QT_EQUIP_TV o limite é 4 equipamentos para cada 3 salas existentes; QT_PROF_ASSIST_SOCIAL segue a mesma razão profissional/matrícula. Decisão da equipe (não do INEP): tratar o código como não informado antes de calcular qualquer indicador. Sem isso, o índice de equipamentos por sala iria a 164,79 (88888 entraria na soma de TVs). Os três números publicados (0,3558→0,36; 0,5999→0,60; 17,81%) batem com o cálculo com o tratamento, e não com o sujo. <b>Registro:</b> este slide é o registro escrito do passo; se a banca perguntar "onde", dizer que o tratamento está no notebook censo_escolar.ipynb (confirmar com o desenvolvedor em que célula). <b>Os dois números de 91/47:</b> 91 é o total de escolas com 88888 em QT_PROF_PSICOLOGO na base ativa inteira (47 públicas, 44 privadas); só as 47 públicas entram no universo do indicador 4.3. Verificado na base real: QT_SALAS_UTILIZADAS e QT_SALAS_UTILIZADAS_ACESSIVEIS têm zero ocorrências de 88888, então a frase "nenhum registro excluído" da ficha 4.1 está correta. O registro 43145833 foi mantido, não corrigido. Data: a de acesso registrada nas referências (30 ago. 2026).</aside>
+</section>
+
+<!-- 6. DIAGNÓSTICO POR VARIÁVEL -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 1</b> · A base e a decisão</span><span class="pg">06</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto I · Diagnóstico de qualidade</div>
+  <h2 style="margin-top:8px">Quanto falta em cada variável que usamos</h2>
+  <table class="t dq">
+    <tr><th>Variável usada</th><th style="width:110px">Indicador</th><th style="width:130px">Ausentes</th><th style="width:90px">%</th><th style="width:470px">Leitura</th></tr>
+    <tr><td class="mono">QT_SALAS_UTILIZADAS</td><td>4.1 · 4.2</td><td class="no tnum">0</td><td class="no tnum">0,00%</td><td class="why">Nenhum nulo.</td></tr>
+    <tr><td class="mono">QT_SALAS_UTILIZADAS_ACESSIVEIS</td><td>4.1</td><td class="no tnum">0</td><td class="no tnum">0,00%</td><td class="why">107.487 zeros (59,54%): zero declarado, não ausente.</td></tr>
+    <tr><td class="mono">QT_EQUIP_TV</td><td>4.2</td><td class="no tnum">1.893</td><td class="no tnum">1,05%</td><td class="why">Todos 88888.</td></tr>
+    <tr><td class="mono">QT_EQUIP_LOUSA_DIGITAL</td><td>4.2</td><td class="no tnum">58</td><td class="no tnum">0,03%</td><td class="why">Zero declarado em 84,08%: não é ausente.</td></tr>
+    <tr><td class="mono">QT_EQUIP_MULTIMIDIA</td><td>4.2</td><td class="no tnum">1.091</td><td class="no tnum">0,60%</td><td class="why">1.091 nulos nesta variável.</td></tr>
+    <tr><td class="mono">QT_PROF_PSICOLOGO</td><td>4.3</td><td class="no tnum">91</td><td class="no tnum">0,05%</td><td class="why">47 entre as 138.086 públicas. 80,54% das ativas têm zero: valor declarado.</td></tr>
+  </table>
+  <div class="two dq2">
+    <div><h3>Chave e grafias</h3><div class="i">CO_ENTIDADE: 0 duplicatas, 0 nulos, 0 linhas inteiras duplicadas (no bruto e na reduzida). SG_UF com 27 valores e NO_REGIAO com 5, sem divergência de grafia; 1 registro sem UF e região (43145833).</div></div>
+    <div><h3>88888 no bruto e equipamentos</h3><div class="i">10.137 ocorrências nas 32 variáveis QT_; a reduzida é o bruto com 88888 tratado como nulo (verificado). À parte da tabela: só 3 escolas ativas não informam nenhum dos 3 equipamentos.</div></div>
+  </div>
+  <div class="foot"><span>Ausentes = nulos entre as 180.540 escolas ativas. Os 15,7% do TDE 1 incluíam as 33.652 inativas, vazias por definição (33.652 ÷ 214.192). Script: verificacao/diagnostico_qualidade.py</span></div>
+  <aside class="notes"><b>[2:45 — 35 s]</b> Responde "que decisão sobre valores ausentes e onde está registrado": o que falta é pouco e está concentrado no 88888 (TV 1.893 é o pior caso). Zero não é ausente: 59,54% das ativas declaram zero sala acessível e 80,54% declaram zero psicólogo; esses zeros entram no cálculo. Só 3 escolas ativas não informam nenhum dos 3 equipamentos. Chave sem duplicata, grafias consistentes. Números gerados por verificacao/diagnostico_qualidade.py sobre a reduzida; a contagem de 88888 no bruto (10.137) vem do mesmo script com o arquivo bruto.</aside>
+</section>
+
+<!-- 7. RASTREABILIDADE + ARREDONDAMENTO -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 1</b> · A base e a decisão</span><span class="pg">07</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto I · Rastreabilidade e convenção</div>
+  <h2 style="margin-top:8px">Todo número volta ao dado bruto</h2>
+  <div class="links">
+    <div class="lk"><small>Fonte primária (INEP)</small><a href="https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar" target="_blank" rel="noopener">gov.br/inep/pt-br/<wbr>acesso-a-informacao/<wbr>dados-abertos/microdados/<wbr>censo-escolar</a><span>Microdados originais: 290 variáveis, 135 MB, latin-1</span></div>
+    <div class="lk"><small>Arquivo reduzido entregue pela equipe (Drive)</small><a href="https://drive.google.com/drive/folders/15tbro2EgrehapRHghUXw7OMB1LwzNx3b?usp=sharing" target="_blank" rel="noopener">drive.google.com/drive/folders/<wbr>15tbro2EgrehapRHghUXw7OMB1LwzNx3b</a><span>37 variáveis, ~18 MB, CSV UTF-8; nenhuma variável criada</span></div>
+  </div>
+  <div class="two" style="margin-top:26px">
+    <div>
+      <h3>Fio condutor</h3>
+      <div class="i">Lei nº 13.935/2019: psicólogo e assistente social nas redes públicas de educação básica.</div>
+      <h3 style="margin-top:18px">Fonte de cálculo</h3>
+      <div class="i" style="font-size:19px;padding:12px 0"><b>Todos os indicadores do Bloco 3 foram calculados sobre o arquivo reduzido (37 variáveis)</b>, não sobre a base bruta de 290. Os dois dão o mesmo resultado; o reduzido é a fonte oficial de cálculo da equipe.</div>
+    </div>
+    <div>
+      <h3>Convenção de arredondamento, declarada uma vez</h3>
+      <div class="rule-box"><small>ABNT NBR 5891:2014</small>Se o algarismo seguinte é 5 exato, arredonda-se para o par mais próximo.</div>
+      <div class="i">Coeficientes e índices com 2 casas; taxas em % com 2 casas. Cada indicador mostra o <b>valor bruto → o apresentado</b>.</div>
+    </div>
+  </div>
+  <aside class="notes"><b>[3:20 — 20 s]</b> <b>Ponto de reprodutibilidade:</b> todos os números do bloco 3 saem do arquivo reduzido do Drive (37 variáveis); ele reproduz exatamente 0,3558 / 0,5999 / 17,81% da base completa. Se a banca perguntar qual arquivo abrir para conferir: o reduzido.  Declarar a regra ABNT aqui e não repetir depois. Confirmar com a equipe que 2 casas é o padrão dos PDFs.</aside>
+</section>
+
+<!-- 8. POSIÇÃO DA BASE -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 1</b> · A base e a decisão</span><span class="pg">08</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto I · Posição da equipe sobre a base</div>
+  <h2 style="margin-top:8px;max-width:1100px">Pergunta que a base responde</h2>
+  <div class="rule-box" style="margin-top:18px"><small>Lei nº 13.935/2019</small>Como as escolas declaram, em 2025, estrutura, equipamentos e vínculo formal de psicólogo, entre redes e regiões?</div>
+  <div class="two">
+    <div><h3>Serve para comparar</h3>
+      <div class="i"><b>Estrutura, equipamentos e vínculo formal de psicólogo</b>, entre redes e regiões, como <b>declarados pelas escolas em 2025</b>.</div></div>
+    <div><h3>Não serve para medir</h3>
+      <div class="i"><b>Qualidade ou uso efetivo.</b></div>
+      <div class="i"><b>Tendência ou causalidade</b> (corte de 2025).</div>
+      <div class="i"><b>Recurso por aluno</b> (sem matrícula na base reduzida).</div></div>
+  </div>
+  <div class="foot"><span>Censo Escolar: levantamento declaratório do INEP.</span></div>
+  <aside class="notes"><b>[3:40 — 20 s; fecha o bloco 1 em 4:00]</b> Frase de posição, ler inteira: "Esta base serve para comparar, entre redes e regiões, estrutura, equipamentos e vínculo formal de psicólogo declarados pelas escolas em 2025. Não serve para medir qualidade ou uso efetivo, tendência/causalidade (corte de 2025) nem recurso por aluno (sem matrícula na base reduzida)." Não afirmar finalidade original do Censo além de "levantamento declaratório do INEP". Liga com as limitações (slide 17) e com a crítica 3 do peer review.</aside>
+</section>
+
+<!-- 9. LISTA DE INDICADORES -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 2</b> · O que a base permite medir</span><span class="pg">09</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto II · Indicadores possíveis</div>
+  <h2 style="margin-top:8px">Dez indicadores possíveis; três calculados</h2>
+  <div class="note-line" style="margin-top:10px;font-size:16px;line-height:1.35;max-width:1136px"><b>Critério dos três:</b> um por categoria (taxa, coeficiente, índice) · calculável só com colunas da base reduzida · perguntas distintas · limite de tempo da defesa.</div>
+  <table class="t lst">
+    <tr><th style="width:36px"></th><th style="width:270px">Indicador</th><th style="width:310px">Pergunta que responderia</th><th style="width:400px">Variáveis</th><th style="width:120px">Status</th></tr>
+    <tr class="d"><td class="lt">a</td><td>Cobertura de psicólogo <i class="ct">taxa</i></td><td>Que fração das escolas públicas tem psicólogo?</td><td class="mono">QT_PROF_PSICOLOGO · TP_DEPENDENCIA · TP_SITUACAO_FUNCIONAMENTO</td><td class="sc">calculado</td></tr>
+    <tr class="d"><td class="lt">b</td><td>Acessibilidade <i class="cb">coeficiente</i></td><td>Que fração das salas em uso é acessível?</td><td class="mono">QT_SALAS_UTILIZADAS_ACESSIVEIS · QT_SALAS_UTILIZADAS · TP_SITUACAO_FUNCIONAMENTO</td><td class="sc">calculado</td></tr>
+    <tr><td class="lt"></td><td>Salas climatizadas <i>coeficiente</i></td><td>Que fração das salas em uso é climatizada?</td><td class="mono">QT_SALAS_UTILIZA_CLIMATIZADAS · QT_SALAS_UTILIZADAS</td><td class="sl">não calculado</td></tr>
+    <tr class="d"><td class="lt">c</td><td>Equipamentos por sala <i class="ci">índice</i></td><td>TV, lousa e multimídia por sala em uso?</td><td class="mono">QT_EQUIP_TV · QT_EQUIP_LOUSA_DIGITAL · QT_EQUIP_MULTIMIDIA · QT_SALAS_UTILIZADAS · TP_SITUACAO_FUNCIONAMENTO</td><td class="sc">calculado</td></tr>
+    <tr><td class="lt"></td><td>Informatização discente <i>índice</i></td><td>Quantos computadores e tablets de aluno por sala em uso?</td><td class="mono">QT_DESKTOP_ALUNO · QT_COMP_PORTATIL_ALUNO · QT_TABLET_ALUNO · QT_SALAS_UTILIZADAS</td><td class="sl">não calculado</td></tr>
+    <tr><td class="lt">d</td><td>Descontinuidade escolar por UF <i>taxa</i></td><td>Que fração da UF não está em atividade?</td><td class="mono">SG_UF · TP_SITUACAO_FUNCIONAMENTO</td><td class="sl">não calculado</td></tr>
+  </table>
+  <div class="foot"><span>Mostrados: os 3 calculados e 3 exemplos não calculados. Lista completa dos 10 nas notas.</span><span>Por sala: ÷ QT_SALAS_UTILIZADAS (escolas ativas).</span></div>
+  <aside class="notes"><b>[4:00 — 3 min]</b> Frentes: a) corpo técnico-pedagógico e conformidade legal; b) infraestrutura física das salas; c) equipamentos e tecnologia; d) distribuição geográfica e institucional. Só mostrar a lista e o critério, não ler linha a linha. Os três escolhidos são um por categoria (taxa, coeficiente, índice), calculáveis só com colunas da base reduzida, com perguntas distintas e dentro do tempo da defesa. <b>Pergunta provável:</b> "por que não calcularam os outros?" — listados para cobrir o item exigido; o aprofundamento foi limitado ao tempo. <b>Limites a declarar se perguntarem:</b> informatização discente "por aluno" não é possível (sem matrícula na base reduzida), então a pergunta é sobre quantidade declarada; descontinuidade usa só a situação de funcionamento (corte de 2025), não mede evolução no tempo; disparidade entre redes usa TP_DEPENDENCIA. Nenhum dos sete restantes foi calculado. <b>Lista completa dos 10 (indicador · pergunta · variáveis):</b> (a) cobertura de psicólogo e de assistente social, taxa (um indicador, como na Seção III do Segundo envio): que fração das escolas públicas tem o profissional? QT_PROF_PSICOLOGO, TP_DEPENDENCIA, TP_SITUACAO_FUNCIONAMENTO [calculado para psicólogo; assistente social usa QT_PROF_ASSIST_SOCIAL e não foi calculado]; apoio pedagógico por sala, índice: pedagogia e coordenação por sala? QT_PROF_PEDAGOGIA, QT_PROF_COORDENADOR; segurança e serviços gerais por sala, índice: QT_PROF_SEGURANCA, QT_PROF_SERVICOS_GERAIS. (b) acessibilidade, coeficiente: QT_SALAS_UTILIZADAS_ACESSIVEIS, QT_SALAS_UTILIZADAS [calculado]; salas climatizadas, coeficiente: QT_SALAS_UTILIZA_CLIMATIZADAS, QT_SALAS_UTILIZADAS; salas fora do prédio, coeficiente: QT_SALAS_UTILIZADAS_FORA, QT_SALAS_UTILIZADAS. (c) equipamentos por sala, índice: QT_EQUIP_TV, QT_EQUIP_LOUSA_DIGITAL, QT_EQUIP_MULTIMIDIA, QT_SALAS_UTILIZADAS [calculado]; informatização discente, índice (desktops, portáteis e tablets por sala utilizada): QT_DESKTOP_ALUNO, QT_COMP_PORTATIL_ALUNO, QT_TABLET_ALUNO, QT_SALAS_UTILIZADAS. (d) descontinuidade escolar por UF, taxa: SG_UF, TP_SITUACAO_FUNCIONAMENTO; disparidade entre redes, índice: TP_DEPENDENCIA mais as variáveis do indicador comparado.</aside>
+</section>
+
+<!-- 10. 4.1 -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Indicador 4.1</span><span class="pg">10</span></div>
+  <div class="ind">
+    <div class="lft cb">
+      <div class="k">Coeficiente <span>parte/todo, de 0 a 1</span></div>
+      <h2 style="color:var(--ink)">Acessibilidade das salas de aula</h2>
+      <div class="big-n"><small>nacional · 35,58%</small>0,36</div>
+      <div class="frm" style="color:var(--ink)">Σ salas acessíveis ÷ Σ salas utilizadas<br><span>585.950 ÷ 1.646.884</span></div>
+      <div class="round" style="color:var(--ink-2)">bruto → apresentado: <b>0,3558 → 0,36</b></div>
+      <div class="q" style="color:var(--ink)"><div class="cap">Teste das três perguntas</div>
+        <div class="r"><span>Numerador contido no denominador?</span><b class="s">sim</b></div>
+        <div class="r"><span>Mesma grandeza (sala ÷ sala)?</span><b class="s">sim</b></div>
+        <div class="r"><span>Referido a um período?</span><b class="nn">não</b></div></div>
+    </div>
+    <div class="rgt cb" data-chart="c41"></div>
+  </div>
+  <div class="foot"><span>Declarada, não verificada.</span><span>Sudeste tem o menor coeficiente das 5 regiões.</span></div>
+  <aside class="notes"><b>[7:00 — 2 min]</b> Parte/todo, mesma grandeza, sem período ⇒ <b>coeficiente</b>. Federal 0,74 é o dobro das demais redes (0,33 a 0,37). Regiões: Centro-Oeste 0,53, Sul 0,49, Nordeste 0,35 (0,3511 bruto), Norte 0,30, Sudeste 0,29. O que o dado mostra: o Sudeste tem o menor coeficiente entre as 5 regiões. Se a banca perguntar sobre PIB: era uma hipótese externa da equipe (renda regional), não medida neste conjunto de dados; não afirmar como resultado nem atribuir causa. Não arredondado: 585.950/1.646.884 = 0,35579…; 35,58% → 0,36.</aside>
+</section>
+
+<!-- 11. FICHA 4.1 -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Indicador 4.1 · ficha</span><span class="pg">11</span></div>
+  <div class="k cb" style="border-top:4px solid var(--cat);padding-top:12px;max-width:380px;color:var(--ink)">Coeficiente · acessibilidade</div>
+  <h2 style="margin-top:14px;max-width:1000px">Entre as salas em uso, qual fração tem condição de acessibilidade.</h2>
+  <div class="two fch">
+    <div><h3>Leitura autorizada</h3><div class="i">A fração de salas em uso que é acessível, por rede e por região.</div></div>
+    <div><h3>Leitura não autorizada</h3><div class="i">Não mede a qualidade nem a conformidade normativa da acessibilidade: só a existência declarada.</div></div>
+  </div>
+  <div class="met"><h3>Método de apuração</h3><p>Escolas consideradas: as 180.540 em atividade, de todas as redes. Denominador do indicador: Σ salas utilizadas (1.646.884), não o número de escolas. Nenhum registro excluído: não há valores nulos nessas duas colunas.</p><p class="fm">4.1 = Σ QT_SALAS_UTILIZADAS_ACESSIVEIS ÷ Σ QT_SALAS_UTILIZADAS, com TP_SITUACAO_FUNCIONAMENTO = 1</p><p class="bc"><b>Base de comparação:</b> nacional 0,36; recortes por dependência (TP_DEPENDENCIA) e região (NO_REGIAO). Censo 2025, corte transversal.</p><p class="src">Calculado a partir do arquivo reduzido (37 variáveis), não da base bruta de 290.</p></div>
+  <aside class="notes"><b>[9:00 — 20 s, pode ir para a arguição]</b> Fonte: Segundo envio, seção 4.1 (método) e 5.4, limitação ii (leitura não autorizada). Sem exclusão porque não há nulos nas duas colunas.</aside>
+</section>
+
+<!-- 12. 4.2 -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Indicador 4.2</span><span class="pg">12</span></div>
+  <div class="ind">
+    <div class="lft ci">
+      <div class="k">Índice <span>grandezas diferentes</span></div>
+      <h2 style="color:var(--ink)">Equipamentos tecnológicos por sala</h2>
+      <div class="big-n"><small>equip. por sala</small>0,60</div>
+      <div class="frm" style="color:var(--ink)">Σ(TV + lousa digital + multimídia) ÷ Σ salas utilizadas<br><span>987.980 ÷ 1.646.884</span></div>
+      <div class="round" style="color:var(--ink-2)">bruto → apresentado: <b>0,5999 → 0,60</b></div>
+      <div class="q" style="color:var(--ink)"><div class="cap">Teste das três perguntas</div>
+        <div class="r"><span>Numerador contido no denominador?</span><b class="nn">não</b></div>
+        <div class="r"><span>Mesma grandeza?</span><b class="nn">não</b></div>
+        <div class="r"><span>Referido a um período?</span><b class="nn">não</b></div></div>
+    </div>
+    <div class="rgt ci" data-chart="c42"></div>
+  </div>
+  <div class="foot"><span>Não limitado a 0–1. Recurso por sala, não por aluno.</span></div>
+  <aside class="notes"><b>[9:20 — 1 min 40]</b> Grandezas diferentes (equipamentos ÷ salas) ⇒ <b>índice</b>, pode passar de 1. Federal 0,88 e Estadual 0,81 na frente; Municipal e Privada empatam em 0,54. Sul 0,83 é mais que o dobro do Norte 0,38. Destaque: 22.592 escolas (12,51%) com sala em uso e nenhum dos três equipamentos. Denominador do 12,51% confirmado: 180.540 escolas em atividade (22.592 ÷ 180.540). Não arredondado nacional: 0,59990… → 0,60.</aside>
+</section>
+
+<!-- 13. FICHA 4.2 -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Indicador 4.2 · ficha</span><span class="pg">13</span></div>
+  <div class="k ci" style="border-top:4px solid var(--cat);padding-top:12px;max-width:380px;color:var(--ink)">Índice · equipamentos por sala</div>
+  <h2 style="margin-top:14px;max-width:1136px;font-size:36px">Quantos equipamentos de apoio à aula (TV, lousa digital e projetor multimídia) existem, em média, por sala em uso.</h2>
+  <div class="two fch">
+    <div><h3>Leitura autorizada</h3><div class="i">A densidade média de equipamento tecnológico por sala, comparável entre redes e regiões.</div></div>
+    <div><h3>Leitura não autorizada</h3><div class="i">Não diz se o equipamento funciona, nem cobre tipos de equipamento fora dos três contabilizados.</div></div>
+  </div>
+  <div class="met"><h3>Método de apuração</h3><p>Soma as três variáveis de equipamento (TV, lousa digital, multimídia), mantendo nulo só quando nenhuma das três foi informada (o 88888 conta como não informado). Divide pela Σ de salas utilizadas, entre escolas em atividade.</p><p class="fm">4.2 = Σ (QT_EQUIP_TV + QT_EQUIP_LOUSA_DIGITAL + QT_EQUIP_MULTIMIDIA) ÷ Σ QT_SALAS_UTILIZADAS</p><p class="bc"><b>Base de comparação:</b> nacional 0,60; recortes por dependência e região. Censo 2025, corte transversal.</p><p class="src">Calculado a partir do arquivo reduzido (37 variáveis), não da base bruta de 290.</p></div>
+  <aside class="notes"><b>[11:00 — 20 s, pode ir para a arguição]</b> Fonte: Segundo envio, seção 4.2 (citação do método). "Não cobre outros tipos" é extensão lógica do método; não citar número novo.</aside>
+</section>
+
+<!-- 14. 4.3 -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Indicador 4.3</span><span class="pg">14</span></div>
+  <div class="ind">
+    <div class="lft ct">
+      <div class="k">Taxa <span>referida ao ano-base 2025</span></div>
+      <h2 style="color:var(--ink)">Cobertura de psicólogo nas escolas públicas</h2>
+      <div class="big-n"><small>nacional</small>17,81%</div>
+      <div class="frm" style="color:var(--ink)">(escolas com ≥ 1 psicólogo ÷ escolas públicas ativas) × 100<br><span>(24.587 ÷ 138.086) × 100</span></div>
+      <div class="round" style="color:var(--ink-2)">bruto → apresentado: <b>17,8056% → 17,81%</b></div>
+      <div class="q" style="color:var(--ink)"><div class="cap">Teste das três perguntas</div>
+        <div class="r"><span>Numerador contido no denominador?</span><b class="s">sim</b></div>
+        <div class="r"><span>Mesma grandeza (escola ÷ escola)?</span><b class="s">sim</b></div>
+        <div class="r"><span>Referido a um período?</span><b class="s">sim · 2025</b></div></div>
+    </div>
+    <div class="rgt ct" data-chart="c43"></div>
+  </div>
+  <div class="foot"><span>Mede vínculo formal, não serviço efetivo. Regiões: só escolas públicas ativas.</span><span>Privada: fora do escopo da lei</span></div>
+  <aside class="notes"><b>[11:20 — 2 min]</b> Referida ao ano-base ⇒ <b>taxa</b>. Público = Federal + Estadual + Municipal (138.086 escolas); a Privada aparece só como referência porque a lei não a alcança (fora do escopo da lei, não ilegalidade). Federal 68,16% destoa; Municipal 17,82% e Estadual 16,55% praticamente iguais. Regiões (só escolas públicas ativas): Sul 27,18%, Norte 9,01%. <b>Checagem cruzada:</b> complementa os 82,2% / 31,8% de ausência do Produto I (47 escolas públicas com 88888 em QT_PROF_PSICOLOGO tratadas como não cobertas; 91 na base toda, contando as 44 privadas). <b>Crítica 3 do peer review:</b> é uma taxa de um único ano; não mede evolução (ver limitações). Não arredondado: 24.587/138.086 = 17,805…%.</aside>
+</section>
+
+<!-- 15. FICHA 4.3 -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Indicador 4.3 · ficha</span><span class="pg">15</span></div>
+  <div class="k ct" style="border-top:4px solid var(--cat);padding-top:12px;max-width:380px;color:var(--ink)">Taxa · cobertura de psicólogo</div>
+  <h2 style="margin-top:14px;max-width:1000px">A proporção de escolas públicas em atividade com ao menos um psicólogo no quadro.</h2>
+  <div class="two fch">
+    <div><h3>Leitura autorizada</h3><div class="i">O vínculo formal de psicólogo no quadro, referido ao ano-base 2025.</div></div>
+    <div><h3>Leitura não autorizada</h3><div class="i">Não mede a disponibilidade efetiva do serviço ao longo do ano.</div></div>
+  </div>
+  <div class="met"><h3>Método de apuração</h3><p>Universo do indicador: as 138.086 escolas públicas ativas, contadas as com psicólogo e divididas pelo universo, × 100. 47 delas têm QT_PROF_PSICOLOGO = 88888 (valor extremo, ver slide 5) e são tratadas como não cobertas.</p><p class="fm">4.3 = escolas com QT_PROF_PSICOLOGO ≥ 1 ÷ escolas com TP_DEPENDENCIA ∈ {1, 2, 3} e TP_SITUACAO_FUNCIONAMENTO = 1</p><p class="bc"><b>Base de comparação:</b> nacional 17,81%; recortes por dependência (privada só como referência) e região. Censo 2025, corte transversal.</p><p class="src">Calculado a partir do arquivo reduzido (37 variáveis), não da base bruta de 290.</p></div>
+  <aside class="notes"><b>[13:20 — 20 s, pode ir para a arguição]</b> Fonte: Segundo envio, seção 4.3 (método) e 5.4, limitação iii. <b>Verificado na base real:</b> 91 escolas têm QT_PROF_PSICOLOGO = 88888 em toda a base ativa (47 públicas, dentro do universo de 138.086 do indicador; 44 privadas, fora dele; 47 + 44 = 91). Por isso a ficha diz 47 no universo do indicador e 91 só como contexto da base total (0,05% de 180.540). O "0,05%" é sobre 180.540, não sobre 138.086.</aside>
+</section>
+
+<!-- 16. SÍNTESE -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Síntese</span><span class="pg">16</span></div>
+  <h2 style="font-size:38px;max-width:1136px">A rede federal lidera os três; nenhuma região mantém a posição</h2>
+  <div class="syn">
+    <div>
+      <h3>Convergência · Federal na frente</h3>
+      <div class="row"><span class="a">Acessibilidade <span class="cb">(coeficiente)</span></span><span class="n cb tnum">0,74</span></div>
+      <div class="row"><span class="a">Equipamentos por sala <span class="ci">(índice)</span></span><span class="n ci tnum">0,88</span></div>
+      <div class="row"><span class="a">Cobertura de psicólogo <span class="ct">(taxa)</span></span><span class="n ct tnum">68,16%</span></div>
+      <p class="sub">Padrão observado nos três indicadores.</p>
+    </div>
+    <div>
+      <h3>Divergência · posição da região em cada indicador</h3>
+      <div class="tb h"><span style="text-align:left">1º = maior valor</span><span class="cb">Acess.</span><span class="ci">Equip.</span><span class="ct">Psic.</span></div>
+      <div class="tb"><span class="reg">Sul<small>a mais estável</small></span><span class="p cb">2º<em>de 5</em></span><span class="p ci">1º<em>de 5</em></span><span class="p ct">1º<em>de 5</em></span></div>
+      <div class="tb"><span class="reg">Sudeste<small>a mais instável</small></span><span class="p cb">5º<em>de 5</em></span><span class="p ci">3º<em>de 5</em></span><span class="p ct">2º<em>de 5</em></span></div>
+      <div class="tb"><span class="reg">Centro-Oeste</span><span class="p cb">1º<em>de 5</em></span><span class="p ci">2º<em>de 5</em></span><span class="p ct">4º<em>de 5</em></span></div>
+      <div class="tb"><span class="reg">Nordeste</span><span class="p cb">3º<em>de 5</em></span><span class="p ci">4º<em>de 5</em></span><span class="p ct">3º<em>de 5</em></span></div>
+      <div class="tb"><span class="reg">Norte</span><span class="p cb">4º<em>de 5</em></span><span class="p ci">5º<em>de 5</em></span><span class="p ct">5º<em>de 5</em></span></div>
+      <p class="sub">Nenhuma região mantém a mesma posição nos três indicadores.</p>
+    </div>
+  </div>
+  <div class="pull">Um indicador isolado não sustenta afirmação geral sobre uma região.</div>
+  <aside class="notes"><b>[13:40 — 50 s]</b> Regional: acessibilidade (CO 0,53; Sul 0,49; Nordeste 0,35; Norte 0,30; Sudeste 0,29 ⇒ Sudeste 5º); equipamentos (Sul 0,83; CO 0,71; Sudeste 0,64; Nordeste 0,46; Norte 0,38 ⇒ Sudeste 3º); psicólogo, só escolas públicas ativas (Sul 27,18; Sudeste 21,42; Nordeste 15,55; CO 12,27; Norte 9,01 ⇒ Sudeste 2º). <b>Como ler a tabela:</b> 1º = maior valor do indicador; os três indicadores reportam as 5 regiões, então Sul é 2º de 5 em acessibilidade e Sudeste 5º de 5. As cinco regiões aparecem na tela.</aside>
+</section>
+
+<!-- 17. LIMITAÇÕES -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Limitações</span><span class="pg">17</span></div>
+  <h2>O que estes números não dizem</h2>
+  <div class="lim">
+    <div class="b"><span class="nm">1</span><div><h3>Sem normalização por matrícula</h3><p>É recurso por sala, não por aluno.</p></div></div>
+    <div class="b"><span class="nm">2</span><div><h3>Acessibilidade declarada</h3><p>O Censo registra a existência; não mede a qualidade.</p></div></div>
+    <div class="b"><span class="nm">3</span><div><h3>Cobertura de psicólogo</h3><p>Mede vínculo formal, não o serviço efetivamente prestado.</p></div></div>
+    <div class="b"><span class="nm">4</span><div><h3>Corte transversal de 2025</h3><p>Não permite inferir tendência nem causalidade.</p></div></div>
+    <div class="b" style="grid-column:1 / -1"><span class="nm">5</span><div><h3>Convenção de &ldquo;taxa&rdquo;</h3><p>Seguimos o quadro da disciplina: razão referida ao ano-base 2025. Em epidemiologia, taxa pede tempo de exposição (pessoa-tempo).</p></div></div>
+  </div>
+  <aside class="notes"><b>[14:30 — 20 s]</b> A crítica 3 do peer review (indicador temporal) é exatamente o limite 4. Ter dito antes que "não mede tendência" evita a pergunta hostil. Limite 5 vem da Nota conceitual e da limitação (v) do Segundo envio: a classificação de taxa segue a convenção ampla da disciplina (Fusinato, 2025; Lozada, 2026), não a definição estrita de taxa por pessoa-tempo (Merchán-Hamann; Tauil; Costa, 2000). Passar ao slide 18 (retificações).</aside>
+</section>
+
+<!-- 17b. RETIFICAÇÕES -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 3</b> · Retificações</span><span class="pg">18</span></div>
+  <div class="k" style="color:var(--ink-2)">Produto II · Registro de mudanças</div>
+  <h2 style="margin-top:8px">O que mudou em relação ao Segundo envio</h2>
+  <div class="pr rt">
+    <div class="r"><span class="n">1</span><span class="tx"><b>Numerador da taxa 4.3.</b> 24.588 &rarr; 24.587, por recontagem na base. A taxa segue 17,81%.</span><span class="st ok">Retificado</span></div>
+    <div class="r"><span class="n">2</span><span class="tx"><b>Psicólogo não preenchido.</b> &ldquo;91 públicas ativas&rdquo; &rarr; 47 públicas; as 91 são o total, com 44 privadas.</span><span class="st ok">Retificado</span></div>
+    <div class="r"><span class="n">3</span><span class="tx"><b>Cobertura por região.</b> Todas as redes (Sul 28,37%) &rarr; só públicas ativas (Sul 27,18%), o universo do indicador.</span><span class="st ok">Retificado</span></div>
+    <div class="r"><span class="n">4</span><span class="tx"><b>Acessibilidade, Nordeste.</b> Não reportado &rarr; 0,35. O Sudeste continua o menor (0,29).</span><span class="st op">Acrescentado</span></div>
+  </div>
+  <div class="foot"><span>Os três números nacionais (0,36 · 0,60 · 17,81%) não mudaram. Recontagem: verificacao/diagnostico_qualidade.py</span></div>
+  <aside class="notes"><b>[14:50 — 10 s; fecha o bloco 3 em 15:00, total de 8 min]</b> Só dizer: &ldquo;corrigimos quatro pontos do Segundo envio, estão na tela; os três números nacionais não mudaram&rdquo;. <b>Se perguntarem:</b> (1) 24.587 é a contagem direta de escolas públicas ativas com QT_PROF_PSICOLOGO &ge; 1 (24.587 &divide; 138.086 = 17,8056%); o Segundo envio traz 24.588 e a origem dessa diferença de uma unidade não foi identificada, então refizemos a contagem na base reduzida e no bruto (script verificacao/diagnostico_qualidade.py). (2) Dos 91 registros com 88888 em QT_PROF_PSICOLOGO, 47 são públicas ativas e 44 privadas; só as 47 entram no universo do 4.3. (3) O Segundo envio declarava a região como &ldquo;todas as redes&rdquo; (referência comparativa); no deck usamos só públicas ativas para coincidir com o universo do indicador: Sul 27,18; Sudeste 21,42; Nordeste 15,55; Centro-Oeste 12,27; Norte 9,01. (4) O Segundo envio listava só 4 regiões na acessibilidade; o Nordeste é 0,3511 (&rarr; 0,35).</aside>
+</section>
+
+<!-- 18. PEER REVIEW RECEBIDO -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 4</b> · O peer review nos dois sentidos</span><span class="pg">18</span></div>
+  <div class="k" style="color:var(--ink-2)">Recebido · críticas ao nosso TDE1</div>
+  <h2 style="margin-top:8px">Três críticas recebidas</h2>
+  <div class="pr">
+    <div class="r"><span class="n">1</span><span class="tx">A formatação do documento não seguiu o modelo indicado pelo professor.</span><span class="st op">Recebida</span></div>
+    <div class="r hs"><span class="n">2</span><span class="tx">A escolha da base estava incompleta: faltavam as outras candidatas e os critérios de eliminação.</span><span class="st ok">Contemplado</span></div>
+    <div class="r sub"><span></span><span class="tx"><b>Contrapartida:</b> o TDE 1 traz a comparação nas seções II e V; no deck ela abre o Bloco 1 (slide 4), com TSE 10/11, INPE 9/11, critérios e motivos de eliminação.</span><span></span></div>
+    <div class="r"><span class="n">3</span><span class="tx">O indicador de taxa usado não variava no tempo: recomendação de indicador temporal.</span><span class="st op">Recebida</span></div>
+  </div>
+  <aside class="notes"><b>[15:00 — 2:30; abre o bloco 4, que fecha em 20:00]</b> Lado recebido do peer review: as 3 críticas ao TDE1. Crítica 1 (formatação): reconhecer, sem justificar. Crítica 2 (base incompleta): o TDE 1 entregue já trazia a comparação (seções II e V); dizer que a crítica foi atendida e que a comparação agora abre o Bloco 1, no slide 4, com TSE 10/11 × INPE 9/11 × Censo Escolar, critérios e motivos de eliminação. Não afirmar que foi &ldquo;adicionada depois&rdquo;. Crítica 3 (indicador temporal): reconhecer; o limite 4 (corte transversal de 2025, slide 17) já a reflete. Passar ao slide 20 (lado enviado) por volta de 17:30.</aside>
+</section>
+
+<!-- 19. PEER REVIEW ENVIADO -->
+<section class="slide">
+  <div class="hdr"><span><b>Bloco 4</b> · O peer review nos dois sentidos</span><span class="pg">19</span></div>
+  <div class="k" style="color:var(--ink-2)">Enviado · análise do trabalho da equipe de Rayssa Zacarias Martins</div>
+  <h2 style="margin-top:8px">Três apontamentos e dois pontos positivos</h2>
+  <div class="two">
+    <div>
+      <h3>Apontamentos</h3>
+      <div class="i"><b>Visualização.</b> Incluir gráficos e listas explicativas para dar ênfase aos principais fatores extraídos dos microdados do ENEM.</div>
+      <div class="i"><b>Formatação.</b> Reorganizar o documento: mais detalhado, organizado e de fácil leitura.</div>
+      <div class="i"><b>Fontes.</b> Incluir fontes oficiais complementares (gov.br/INEP) e dados históricos de anos anteriores.</div>
+    </div>
+    <div>
+      <h3>Pontos positivos</h3>
+      <div class="i"><b>Dados corretos.</b> Fundamentados na base oficial do ENEM, apesar de o simulado não ter gráficos.</div>
+      <div class="i"><b>Contexto.</b> Relacionou bem os microdados a SISU, ProUni e FIES.</div>
+    </div>
+  </div>
+  <div class="foot"><span>Equipe avaliada: Rayssa Zacarias Martins e equipe · Base: microdados do ENEM · Fonte: Relatório de Avaliação por Pares</span></div>
+  <aside class="notes"><b>[17:30 — 2:30; fecha o bloco 4 em 20:00]</b> Ler os 3 apontamentos e os 2 pontos positivos, na ordem do relatório. <b>Honestidade sobre o alcance:</b> o relatório tem uma página e está em nível formal/de apresentação; não cita a localização exata de cada ponto no trabalho avaliado, não descreve consequência nem correção além da recomendação, e não entra em método estatístico (indicadores, tratamento de ausentes, arredondamento). Se a banca perguntar por isso, dizer que o relatório não trata e não improvisar. Os dois lados se encontram: recebemos crítica de formatação e de indicador temporal; apontamos formatação e fontes históricas.</aside>
+</section>
+
+<!-- 20. FECHAMENTO -->
+<section class="slide end">
+  <div class="hdr"><span><b>Estatisticamente</b> · Arguição</span><span class="pg">20</span></div>
+  <div class="k" style="color:var(--ink-2)">10 minutos de arguição</div>
+  <h1>Perguntas</h1>
+  <div class="three">
+    <div class="b"><div class="n cb">0,36</div><div class="l">Coeficiente de acessibilidade</div></div>
+    <div class="b"><div class="n ci">0,60</div><div class="l">Índice de equipamentos por sala</div></div>
+    <div class="b"><div class="n ct">17,81%</div><div class="l">Taxa de cobertura de psicólogo</div></div>
+  </div>
+  <div class="foot"><span>Base: Censo Escolar 2025 (INEP) · 180.540 escolas em atividade</span><span>Arredondamento: ABNT NBR 5891:2014</span></div>
+  <aside class="notes"><b>[20:00 → arguição, 10 min]</b> Deixar este slide na tela. Toda resposta sobre número volta ao dado bruto; se não souber, dizer "confirmamos no dado", nunca estimar. <b>Respostas ancoradas (sem lacuna):</b> (1) 0,36 vs 35,58%: coeficiente parte/todo, 0,3558 arredondado (slide 10); 0,60 pode passar de 1 porque é índice de grandezas diferentes (slide 12). (2) Denominador 1.646.884: unidade do indicador é a sala; 180.540 é o universo de escolas (ficha, slide 11). (3) 17,81%: universo 138.086 públicas ativas; 47 públicas com 88888 entram como não cobertas; 91 é a base ativa toda, com 44 privadas, e o 0,05% é sobre 180.540 (slides 14-15). (4) Regiões: os três indicadores reportam as 5 regiões; em psicólogo as regionais são só de escolas públicas ativas (slides 14 e 16). (5) Sudeste: "menor coeficiente das 5 regiões"; não dizer "pior" em geral, nem PIB como resultado. (6) Arquivo: o reduzido de 37 variáveis (slide 7). <b>Lacunas reconhecidas, não improvisar:</b> (a) "Padrão observado nos três indicadores" (slide 16) é leitura descritiva; não há teste nem medida de associação, então não falar em "padrão estrutural" nem em causa. (b) 88888: a decisão é da equipe; não há comparação sistemática com winsorização ou sensibilidade; o impacto 164,79 → 0,60 é só do índice de equipamentos, não extrapolar para as 26 variáveis. (c) Reprodutibilidade auditável: ter a célula do notebook e a comparação reduzido × bruto abertas fora dos slides. (d) Escolha dos 3 indicadores: um por categoria, perguntas diferentes, limite de tempo; os outros foram listados, não calculados. (e) Censo = universo observado, sem amostragem: os números descrevem as escolas do Censo 2025, sem erro-padrão ou IC. (f) Peer review: o relatório enviado (equipe de Rayssa Zacarias Martins, base ENEM) tem uma página, em nível formal; não cita localização exata nem trata de método estatístico. Não ampliar além do que está nele.</aside>
+</section>
+
+<div class="nav" id="nav"></div>
+<div id="notesPanel"></div>
+</div>
+
+<script>
+const stage=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);stage.style.transform='translate(-50%,-50%) scale('+s+')'}
+addEventListener('resize',fit);fit();
+if(new URLSearchParams(location.search).has('export')){document.getElementById('nav').style.display='none';}
+
+/* ---------- gráficos de barras (HTML/CSS, rotulagem direta, base zero) ---------- */
+const f2=v=>v.toFixed(2).replace('.',','), fp=v=>v.toFixed(2).replace('.',',')+'%';
+const CHARTS={
+  c41:{fmt:f2,max:0.8,nat:[0.36,'nacional 0,36'],
+    dep:[['Federal',0.74],['Privada',0.37],['Municipal',0.35],['Estadual',0.33]],
+    reg:[['Centro-Oeste',0.53],['Sul',0.49],['Nordeste',0.35],['Norte',0.30],['Sudeste',0.29]]},
+  c42:{fmt:f2,max:1.0,nat:[0.60,'nacional 0,60'],
+    dep:[['Federal',0.88],['Estadual',0.81],['Municipal',0.54],['Privada',0.54]],
+    reg:[['Sul',0.83],['Centro-Oeste',0.71],['Sudeste',0.64],['Nordeste',0.46],['Norte',0.38]],
+    extra:'<div class="callout-i"><b>22.592 escolas (12,51%)</b> têm sala em uso e zero dos três equipamentos.<div style="font-size:16px;color:var(--ink-2);margin-top:4px">Base: 180.540 escolas em atividade.</div></div>'},
+  c43:{fmt:fp,max:76,nat:[17.81,'nacional 17,81%'],
+    dep:[['Federal',68.16],['Municipal',17.82],['Estadual',16.55],['Privada · referência',24.61,'ref']],
+    reg:[['Sul',27.18],['Sudeste',21.42],['Nordeste',15.55],['Centro-Oeste',12.27],['Norte',9.01]]}
+};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function chart(cfg,title,rows){
+  const nat=cfg.nat[0]/cfg.max*100;
+  const summary=title+': '+rows.map(r=>r[0]+' '+cfg.fmt(r[1])).join('; ')+'. '+cfg.nat[1]+'.';
+  let h='<div class="ch-t">'+esc(title)+'</div><div class="chart" role="group" aria-label="'+esc(summary)+'"><div class="axis"></div>';
+  h+='<div class="nat" style="left:'+nat+'%"><span>'+esc(cfg.nat[1])+'</span></div>';
+  rows.forEach(r=>{const w=r[1]/cfg.max*100,ref=r[2]==='ref';
+    const cmp=r[1]>cfg.nat[0]?'acima do nacional':r[1]<cfg.nat[0]?'abaixo do nacional':'igual ao nacional';
+    const tip=(ref?'fora do escopo da lei · ':'')+cmp;
+    h+='<div class="row" tabindex="0" aria-label="'+esc(r[0]+': '+cfg.fmt(r[1])+', '+tip)+'"><span class="lab'+(ref?' ref':'')+'">'+esc(r[0])+'</span><div class="bar'+(ref?' hatch':'')+'" style="width:'+w+'%;--c:currentColor"></div><span class="val" style="left:calc('+w+'% + 2px)">'+cfg.fmt(r[1])+'</span><div class="tip" style="'+(w>50?'right:calc(100% - '+w+'% + 14px)':'left:calc('+w+'% + 96px)')+'"><b>'+cfg.fmt(r[1])+'</b>'+esc(r[0].replace(' · referência','')+' · '+tip)+'</div></div>';});
+  h+='<table class="sr"><caption>'+esc(title)+'</caption><tr><th>Categoria</th><th>Valor</th></tr>'+rows.map(r=>'<tr><td>'+esc(r[0])+'</td><td>'+cfg.fmt(r[1])+'</td></tr>').join('')+'</table>';
+  return h+'</div>';
+}
+document.querySelectorAll('[data-chart]').forEach(el=>{const c=CHARTS[el.dataset.chart];
+  el.innerHTML=chart(c,'Por dependência',c.dep)+chart(c,'Por região',c.reg)+(c.extra||'');});
+
+/* ---------- navegação ---------- */
+const slides=[...document.querySelectorAll('.slide')];let cur=0;
+function show(n){
+  cur=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===cur));
+  document.getElementById('progress').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('nav').textContent='← → navegar · N notas · F tela cheia';
+  const note=slides[cur].querySelector('.notes');
+  document.getElementById('notesPanel').innerHTML=note?note.innerHTML:'';
+  history.replaceState(null,'','#'+(cur+1));
+}
+addEventListener('keydown',e=>{
+  const foc=document.activeElement;
+  if(e.key===' '&&foc&&foc.closest&&foc.closest('.row,a,button'))return; // espaço em elemento focável não navega
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(cur+1)}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(cur-1)}
+  else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1);
+  else if(e.key==='n'||e.key==='N'){const on=document.getElementById('notesPanel').classList.toggle('show');document.getElementById('nav').textContent=on?'NOTAS ABERTAS · N fecha':'← → navegar · N notas · F tela cheia'}
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+});
+addEventListener('click',e=>{if(e.target.closest('#notesPanel,a'))return;show(cur+(e.clientX<innerWidth*0.2?-1:1))});
+slides.forEach((sl,i)=>{const pg=sl.querySelector('.pg');if(pg)pg.textContent=String(i+1).padStart(2,'0')});
+const start=parseInt(location.hash.slice(1));show(isNaN(start)?0:start-1);
+</script>
+</body>
+</html>
